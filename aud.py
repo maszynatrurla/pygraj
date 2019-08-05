@@ -2,6 +2,10 @@
 import os
 import subprocess
 
+def current_song():
+    process = subprocess.Popen(['audtool', 'current-song'], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    return out.strip()
 
 def playback_stop():
     os.system("audtool playback-stop")

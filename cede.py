@@ -109,7 +109,6 @@ class CedeLayer:
         self.ctx.buttons.removeHandler(self.nextHandler, BUT_NEXT)
         self.ctx.buttons.removeHandler(self.prevHandler, BUT_PREVIOUS)
         self.ctx.buttons.removeHandler(self.stopHandler, BUT_STOP)
-        aud.playlist_clear()
         ui = self.ctx.cede_ui
         ui.hide()
     
