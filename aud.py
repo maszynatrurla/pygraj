@@ -26,7 +26,7 @@ def playlist_clear():
     os.system("audtool playlist-clear")
     
 def playlist_addurl(url):
-    os.system("audtool playlist-addurl " + url)
+    os.system("audtool playlist-addurl \"" + url + "\"")
     
 def playlist_display():
     process = subprocess.Popen(['audtool', 'playlist-display'], stdout=subprocess.PIPE)

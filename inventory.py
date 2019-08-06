@@ -132,7 +132,7 @@ if __name__ == "__main__":
     l.scan()
 
     with open(args.output_file, "w") as fp:
-        pickle.dump(l, fp)
+        pickle.dump(l.lib, fp)
         
     for name, artist in l.lib["artists"].iteritems():
         print(name)

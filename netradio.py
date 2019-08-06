@@ -21,6 +21,15 @@ class PlayPauseHandler(pscan.CzypiskHandler):
     def onPress(self, button):
         aud.playback_playpause()
         self.ctx.event_queue.put("playing-changed")
+        
+class StopHandler(pscan.CzypiskHandler):
+    
+    def __init__(self, ctx):
+        self.ctx = ctx
+    
+    def onClick(self, button):
+        aud.playback_stop()
+        self.ctx.event_queue.put("playing-changed")
 
 class NetradioLayer:
     
@@ -29,6 +38,7 @@ class NetradioLayer:
         self.isOpen = False
         self.srcHandler = SrcHandler(context)
         self.playHandler = PlayPauseHandler(context)
+        self.stopHandler = StopHandler(context)
         
     def open(self):
         if self.isOpen:
@@ -36,6 +46,7 @@ class NetradioLayer:
         
         self.ctx.buttons.addHandler(self.srcHandler, BUT_SOURCE)
         self.ctx.buttons.addHandler(self.playHandler, BUT_PLAYPAUSE)
+        self.ctx.buttons.addHandler(self.stopHandler, BUT_STOP)
         ui = self.ctx.netradio_ui
         ui.show()
         
@@ -62,6 +73,7 @@ class NetradioLayer:
         self.isOpen = False
         self.ctx.buttons.removeHandler(self.srcHandler, BUT_SOURCE)
         self.ctx.buttons.removeHandler(self.playHandler, BUT_PLAYPAUSE)
+        self.ctx.buttons.removeHandler(self.stopHandler, BUT_STOP)
         ui = self.ctx.netradio_ui
         ui.hide()
     
