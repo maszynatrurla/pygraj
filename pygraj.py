@@ -18,6 +18,7 @@ import cede
 import esde
 import netradio
 import pod
+import nowplay
 
 def log_init():
     logging.basicConfig()
@@ -59,6 +60,7 @@ def createLayers(context):
     context.esde_layer = esde.EsdeLayer(context)
     context.netradio_layer = netradio.NetradioLayer(context)
     context.pod_layer = pod.PodLayer(context)
+    context.nowplay_layer = nowplay.NowPlayingLayer(context)
     
 def main():
     ret = -1

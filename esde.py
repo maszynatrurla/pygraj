@@ -115,11 +115,14 @@ class EsdeLayer:
         self.ctx.buttons.addHandler(self.rightHandler    , BUT_RIGHT)
         self.ctx.buttons.addHandler(self.equeueHandler   , BUT_QUEUE)
         
-        self.ctx.artists_view.setContent(self.library["artists"].keys())
+        artists = [artist for artist in self.library["artists"].keys()]
+        artists.sort()
+        self.ctx.artists_view.setContent(artists)
         self.ctx.songs_view.unfocus()
         self.ctx.artists_view.focus()
         self.focused = self.ctx.artists_view
         self.unfocused = self.ctx.songs_view
+        self.move_list_selection()
         ui = self.ctx.esde_ui
         ui.show()
         
@@ -134,14 +137,53 @@ class EsdeLayer:
             content = album_song_sc_handler.create_content(self.library["artists"][selected_artist])
             self.ctx.songs_view.setContent(content)
             
-    def play_one(self):
+    def play_song(self):
         selection = self.ctx.songs_view.getSelection()
-        if (selection is None) or (selection[0] == 0):
+        if selection is None:
             return
         
-        aud.playback_stop()            
+        if selection[0] == 0:
+            self.play_album()
+        else:
+            content = self.ctx.songs_view.getContent()
+            
+            aud.playback_stop()            
+            aud.playlist_clear()
+            
+            for idx in xrange(self.ctx.songs_view.getSelectionIndex(), len(content)):
+                tpe, obj = content[idx]
+                if tpe == 1:
+                    aud.playlist_addurl(obj.pth)
+            
+            aud.playback_playpause()
+            
+    def play_album(self):
+            content = self.ctx.songs_view.getContent()
+            
+            aud.playback_stop()            
+            aud.playlist_clear()
+            
+            for idx in xrange(self.ctx.songs_view.getSelectionIndex() + 1, len(content)):
+                tpe, obj = content[idx]
+                if tpe == 1:
+                    aud.playlist_addurl(obj.pth)
+                else:
+                    break
+            
+            aud.playback_playpause()
+        
+    def play_artist(self):
+        artist_content = self.ctx.songs_view.getContent()
+        if not artist_content:
+            return
+            
+        aud.playback_stop()
         aud.playlist_clear()
-        aud.playlist_addurl(selection[1].pth)
+        
+        for tpe, obj in artist_content:
+            if tpe == 1:
+                aud.playlist_addurl(obj.pth)
+        
         aud.playback_playpause()
         
     def cycle(self):
@@ -149,6 +191,8 @@ class EsdeLayer:
             msg = self.ctx.event_queue.get(timeout=.5)
             if msg == "source":
                 return self.ctx.source_layer
+            elif msg == "change-view":
+                return self.ctx.nowplay_layer
             elif msg == ">":
                 self.ctx.artists_view.unfocus()
                 self.ctx.songs_view.focus()
@@ -171,7 +215,9 @@ class EsdeLayer:
                 self.move_list_selection()
             elif msg == "enter":
                 if self.focused == self.ctx.songs_view:
-                    self.play_one()
+                    self.play_song()
+                else:
+                    self.play_artist()
         except Queue.Empty:
             pass
         

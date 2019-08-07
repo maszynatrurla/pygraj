@@ -1,11 +1,23 @@
 
 from PyQt5.QtGui import QColor, QFont
 
+def sort_song(songx, songy):
+    try:
+        return int(songx.props["track"]) - int(songy.props["track"])
+    except:
+        return 0
+
 def create_content(artist):
     items = []
-    for name, album in artist.get("albums", {}).iteritems():
+    album_dir = artist.get("albums", {})
+    albums = [name for name in album_dir.keys()]
+    albums.sort()
+    for name in albums:
         items.append((0, name))
-        for song in album.get("songs", ()):
+        songs = [song for song in album_dir[name].get("songs", ())]
+        songs.sort(sort_song)
+        
+        for song in songs:
             items.append((1, song))
         
     return items

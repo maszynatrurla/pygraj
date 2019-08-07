@@ -50,8 +50,10 @@ class NetradioLayer:
         ui = self.ctx.netradio_ui
         ui.show()
         
+        aud.playback_stop()
         aud.playlist_clear()
         aud.playlist_addurl("https://somafm.com/indiepop.pls")
+        aud.playback_playpause()
         
         self.isOpen = True
         

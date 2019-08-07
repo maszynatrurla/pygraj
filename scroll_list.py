@@ -106,6 +106,9 @@ class ScrollableList(QWidget):
         self.calculateScrollWin()
         self.update()
         
+    def getContent(self):
+        return self.content
+        
     def removeAll(self):
         self.selected = []
         self.content = []

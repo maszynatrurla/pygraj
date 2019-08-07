@@ -8,6 +8,7 @@ import ui_pod
 import ui_esde
 import ui_netradio
 import ui_cede
+import ui_nowplay
 
 
 class MyDimensions:
@@ -44,6 +45,8 @@ def createLayers(window, context):
     context.netradio_ui.construct(window)
     context.pod_ui = ui_pod.PodView(context)
     context.pod_ui.construct(window)
+    context.nowplay_ui = ui_nowplay.NowPlayingView(context)
+    context.nowplay_ui.construct(window)
     
 
 class Gui:

@@ -51,7 +51,8 @@ class Czypiski:
         
 class Czypisk:
     
-    LONG_PRESS_TIME = 2
+    LONG_PRESS_TIME = 1
+    LONG_PRESS_TIME_2 = 0.5
     
     STATE_IDK = 0
     STATE_PRESSED = 1
@@ -72,8 +73,15 @@ class Czypisk:
         
     def setPressed(self):
         if self.state == Czypisk.STATE_PRESSED:
-            if time.time() - self.pressedTs > Czypisk.LONG_PRESS_TIME:
+            nowts = time.time()
+            if nowts - self.pressedTs > Czypisk.LONG_PRESS_TIME:
                 self.state = Czypisk.STATE_LONG_PRESSED
+                self.pressedTs = nowts
+                self.longPressEvt()
+        elif self.state == Czypisk.STATE_LONG_PRESSED:
+            nowts = time.time()
+            if nowts - self.pressedTs > Czypisk.LONG_PRESS_TIME_2:
+                self.pressedTs = nowts
                 self.longPressEvt()
         elif self.state == Czypisk.STATE_RELEASED:
             self.state = Czypisk.STATE_PRESSED
@@ -83,6 +91,8 @@ class Czypisk:
         if self.state == Czypisk.STATE_PRESSED:
             self.releaseEvt()
             self.clickEvt()
+        elif self.state == Czypisk.STATE_LONG_PRESSED:
+            self.releaseEvt()
         self.state = Czypisk.STATE_RELEASED
         
     def longPressEvt(self):
@@ -133,7 +143,6 @@ class CzypiskThread(threading.Thread):
                 self.consumePresses(presses)
                 if not presses:
                     self.somethingWasPressed = False
-                time.sleep(.05)
             else:
                 os.lseek(czypiski.intFp, 0, os.SEEK_SET)
                 value = os.read(czypiski.intFp, 6).strip()
@@ -141,7 +150,8 @@ class CzypiskThread(threading.Thread):
                     self.somethingWasPressed = True
                     presses = getPresses()
                     self.consumePresses(presses)
-                time.sleep(.1)
+                    
+            time.sleep(.05)
         
         czypiski.close()
         
