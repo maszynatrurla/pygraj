@@ -1,11 +1,15 @@
 
 import Queue
+import traceback
+import os.path
 import pscan
+import shutil
 
 from hardconf import *
 
 import aud
 import playlist
+import mutagen
 
 class SrcHandler(pscan.CzypiskHandler):
     
@@ -88,6 +92,7 @@ class NowPlayingLayer:
         self.ctx.buttons.addHandler(self.equeueHandler, BUT_QUEUE)
         
         self.ctx.playlist = playlist.Playlist(self.ctx)
+        self.now_filename = ""
         
         ui = self.ctx.nowplay_ui
         ui.show()
@@ -117,8 +122,33 @@ class NowPlayingLayer:
         if changes:
             self.ctx.playsongs_view.update()
             self.ctx.playstatus_view.update()
+            self.updateAlbumArt()
         
         return is_playing
+        
+    def updateAlbumArt(self):
+        out = aud.current_song_filename()
+        if out != self.now_filename:
+            self.now_filename = out
+            if out:
+                try:
+                    tags = mutagen.File(self.now_filename).tags
+                    for k in tags:
+                        if k.startswith("APIC"):
+                            with open("/var/run/user/1000/pygraj_cover.jpg", "wb") as fp:
+                                fp.write(tags[k].data)
+                                self.ctx.album_art_view.setArt(True)
+                            break
+                    else:
+                        cover_file = os.path.join(os.path.dirname(self.now_filename), "cover.jpg")
+                        if os.path.exists(cover_file):
+                            shutil.copyfile(cover_file, "/var/run/user/1000/pygraj_cover.jpg")
+                            self.ctx.album_art_view.setArt(True)
+                        else:
+                            self.ctx.album_art_view.setArt(False)
+                except:
+                    traceback.print_exc()
+            
         
     def cycle(self):
         try:

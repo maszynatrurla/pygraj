@@ -7,6 +7,11 @@ def current_song():
     out, err = process.communicate()
     return out.strip()
 
+def current_song_filename():
+    process = subprocess.Popen(['audtool', 'current-song-filename'], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    return out.strip()    
+
 def playback_stop():
     os.system("audtool playback-stop")
 

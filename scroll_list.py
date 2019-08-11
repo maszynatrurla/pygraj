@@ -14,6 +14,10 @@ class ScrollableList(QWidget):
         self.selected = []
         self.focused = False
         self.handler = contentHandler
+        self.hasBorder = True
+        
+    def setBorder(self, hasBorder):
+        self.hasBorder = hasBorder
         
     def calculateScrollWin(self):
         if not self.content:
@@ -61,7 +65,8 @@ class ScrollableList(QWidget):
         ww, wh = self.dims
         qp.fillRect(0, 0, ww, wh, QColor.fromRgb(0, 0, 0))
         qp.setPen(QPen(QColor.fromRgb(255, 255, 255), 2, 1, 0, 0x80))
-        qp.drawRect(1, 1, ww - 2 , wh - 2)
+        if self.hasBorder:
+            qp.drawRect(1, 1, ww - 2 , wh - 2)
         
         if self.content:
             self.paintScroll(qp)
