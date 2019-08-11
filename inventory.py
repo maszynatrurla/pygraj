@@ -3,7 +3,6 @@ import glob
 import logging
 import pickle
 import argparse
-import pickle
 
 import mp3_tagger
 from PIL import Image
@@ -65,15 +64,15 @@ class Song:
     
 def inventorize_audio_file(pth, lib):
     try:
-        mp3 = mp3_tagger.MP3File(pth)
-        tags = mp3.get_tags()
-        tags = tags.get("ID3TagV2", tags.get("ID3TagV1"))
+        #mp3 = mp3_tagger.MP3File(pth)
+        #tags = mp3.get_tags()
+        #tags = tags.get("ID3TagV2", tags.get("ID3TagV1"))
         artist, album, song, track = ("???", "???", None, 0)
-        if tags is not None:
-            artist = tags.get("artist", "???")
-            album = tags.get("album", "???")
-            song = tags.get("song", os.path.splitext(os.path.split(pth)[-1])[0])
-            track = tags.get("track", 0)
+        #if tags is not None:
+        #    artist = tags.get("artist", "???")
+        #    album = tags.get("album", "???")
+        #    song = tags.get("song", os.path.splitext(os.path.split(pth)[-1])[0])
+        #    track = tags.get("track", 0)
             
         obj = Song(pth, artist = artist, album = album, song = song, track = track)
         obj_artist = lib.setdefault("artists", {}).setdefault(artist, {})

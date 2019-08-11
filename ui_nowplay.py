@@ -1,8 +1,11 @@
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtGui import QPainter, QColor, QPen
 
 from gui_al import *
+
+import scroll_list
+import nowplay_sc_handler
 
 class NowPlayingPanel(QWidget):
 
@@ -17,6 +20,45 @@ class NowPlayingPanel(QWidget):
         qp.fillRect(0, 0, sw, sh, QColor.fromRgb(0, 0, 0))
         
         qp.end()
+        
+class AlbumArtPanel(QWidget):
+    def __init__(self, parent, x, y, w, h):
+        QWidget.__init__(self, parent)
+        self.setGeometry(x, y, w, h)
+        self.dims = (w, h)
+        
+    def paintEvent(self, event):
+        qp = QPainter()
+        qp.begin(self)
+        
+        ww, wh = self.dims
+        qp.fillRect(0, 0, ww, wh, QColor.fromRgb(0, 0, 0))
+        qp.setPen(QPen(QColor.fromRgb(255, 255, 255), 2, 1, 0, 0x80))
+        qp.drawRect(1, 1, ww - 2 , wh - 2)
+
+        qp.end()
+        
+class PlayStatusView(QWidget):
+    def __init__(self, ctx, parent, x, y, w, h):
+        QWidget.__init__(self, parent)
+        self.ctx = ctx
+        self.setGeometry(x, y, w, h)
+        self.dims = (w, h)
+        
+    def paintEvent(self, event):
+        qp = QPainter()
+        qp.begin(self)
+        
+        ww, wh = self.dims
+        qp.fillRect(0, 0, ww, wh, QColor.fromRgb(0, 0, 0))
+        qp.setPen(QPen(QColor.fromRgb(255, 255, 255), 2, 1, 0, 0x80))
+        qp.drawRect(1, 1, ww - 2 , wh - 2)
+        
+        if self.ctx.playlist.position > 0 and self.ctx.playlist.position <= len(self.ctx.playlist.tracks):
+            track, title, tlen = self.ctx.playlist.tracks [self.ctx.playlist.position - 1]
+            qp.drawText(2, 2, ww - 4, wh - 4, 0x84, title)
+               
+        qp.end()
 
 class NowPlayingView:
     
@@ -28,6 +70,11 @@ class NowPlayingView:
         w, h = getScreenSize()
         self.widget.hide()
         self.widget.setGeometry(0, 0, w, h)
+        
+        self.ctx.album_art_view = AlbumArtPanel(self.widget, 3, 3, (w - 9) / 2, int((h - 9) * .8))
+        self.ctx.playsongs_list_handler = nowplay_sc_handler.NowplayListHandler(self.ctx)
+        self.ctx.playsongs_view = scroll_list.ScrollableList(self.widget, (w - 9) / 2 + 3, 3, (w - 9) / 2, int((h - 9) * .8), self.ctx.playsongs_list_handler)
+        self.ctx.playstatus_view = PlayStatusView(self.ctx, self.widget, 3, int(h * 0.8) - 3, w - 6, int((h - 9) * .2))
 
     def show(self):
         self.widget.show()

@@ -9,6 +9,8 @@ from hardconf import *
 import album_song_sc_handler
 import aud
 
+from inventory import *
+
 class SrcHandler(pscan.CzypiskHandler):
     
     def __init__(self, ctx):
@@ -115,7 +117,7 @@ class EsdeLayer:
         self.ctx.buttons.addHandler(self.rightHandler    , BUT_RIGHT)
         self.ctx.buttons.addHandler(self.equeueHandler   , BUT_QUEUE)
         
-        artists = [artist for artist in self.library["artists"].keys()]
+        artists = [artist for artist in self.library.keys()]
         artists.sort()
         self.ctx.artists_view.setContent(artists)
         self.ctx.songs_view.unfocus()
@@ -134,7 +136,7 @@ class EsdeLayer:
             selected_artist = self.focused.getSelection()
             if selected_artist is None:
                 return
-            content = album_song_sc_handler.create_content(self.library["artists"][selected_artist])
+            content = album_song_sc_handler.create_content(self.library[selected_artist])
             self.ctx.songs_view.setContent(content)
             
     def play_song(self):
@@ -153,7 +155,7 @@ class EsdeLayer:
             for idx in xrange(self.ctx.songs_view.getSelectionIndex(), len(content)):
                 tpe, obj = content[idx]
                 if tpe == 1:
-                    aud.playlist_addurl(obj.pth)
+                    aud.playlist_addurl(obj[0])
             
             aud.playback_playpause()
             
@@ -166,7 +168,7 @@ class EsdeLayer:
             for idx in xrange(self.ctx.songs_view.getSelectionIndex() + 1, len(content)):
                 tpe, obj = content[idx]
                 if tpe == 1:
-                    aud.playlist_addurl(obj.pth)
+                    aud.playlist_addurl(obj[0])
                 else:
                     break
             
@@ -182,7 +184,7 @@ class EsdeLayer:
         
         for tpe, obj in artist_content:
             if tpe == 1:
-                aud.playlist_addurl(obj.pth)
+                aud.playlist_addurl(obj[0])
         
         aud.playback_playpause()
         

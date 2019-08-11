@@ -45,11 +45,13 @@ class ScrollableList(QWidget):
             self.selected.append(self.scroll_window[0])
         if not self.focused:
             self.focused = True
+            self.handler.focus()
             self.update()
         
     def unfocus(self):
         if self.focused:
             self.focused = False
+            self.handler.unfocus()
             self.update()
         
     def paintEvent(self, event):

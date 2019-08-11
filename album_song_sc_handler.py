@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor, QFont
 
 def sort_song(songx, songy):
     try:
-        return int(songx.props["track"]) - int(songy.props["track"])
+        return songx[1] - songy[1]
     except:
         return 0
 
@@ -14,7 +14,7 @@ def create_content(artist):
     albums.sort()
     for name in albums:
         items.append((0, name))
-        songs = [song for song in album_dir[name].get("songs", ())]
+        songs = [song for song in album_dir[name]]
         songs.sort(sort_song)
         
         for song in songs:
@@ -25,7 +25,7 @@ def create_content(artist):
 class AlbumSongListHandler:
     
     def __init__(self):
-        pass
+        self.focused = False
         
     def calculateSize(self, item):
         return (0, 28)
@@ -33,16 +33,25 @@ class AlbumSongListHandler:
     def preparePainter(self, qp):
         qp.setFont(QFont("DejaVu Serif", 14))
         
+    def focus(self):
+        self.focused = True
+        
+    def unfocus(self):
+        self.focused = False
+        
     def paint(self, item, qp, x, y, w, h, is_selected):
         if is_selected:
-            qp.fillRect(1, y, w, h, QColor.fromRgb(201, 148, 22))
+            if self.focused:
+                qp.fillRect(1, y, w, h, QColor.fromRgb(201, 148, 22))
+            else:
+                qp.fillRect(1, y, w, h, QColor.fromRgb(148, 148, 148))
             
         tpe, obj = item
         
         if 0 == tpe:
             qp.drawText(x, y, w, h, 0x81, obj)
         else:
-            text = u"    " + str(obj.props["track"]) + u" " + obj.props["song"]
+            text = "    %2d %s" % (obj[1], obj[2])
             qp.drawText(x, y, w, h, 0x81, text)
 
     
