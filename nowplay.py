@@ -120,6 +120,7 @@ class NowPlayingLayer:
             changes = True
             
         if changes:
+            self.ctx.playsongs_view.scrollToReveal(position - 1)
             self.ctx.playsongs_view.update()
             self.ctx.playstatus_view.update()
             self.updateAlbumArt()

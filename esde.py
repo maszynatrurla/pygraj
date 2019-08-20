@@ -100,6 +100,7 @@ class EsdeLayer:
         self.leftHandler      = LeftHandler(context)
         self.rightHandler     = RightHandler(context)
         self.equeueHandler    = EqueueHandler(context)
+        self.do_not_refresh_lists = False
         
         with open("music.library") as fp:
             self.library = pickle.load(fp)
@@ -117,14 +118,16 @@ class EsdeLayer:
         self.ctx.buttons.addHandler(self.rightHandler    , BUT_RIGHT)
         self.ctx.buttons.addHandler(self.equeueHandler   , BUT_QUEUE)
         
-        artists = [artist for artist in self.library.keys()]
-        artists.sort()
-        self.ctx.artists_view.setContent(artists)
-        self.ctx.songs_view.unfocus()
-        self.ctx.artists_view.focus()
-        self.focused = self.ctx.artists_view
-        self.unfocused = self.ctx.songs_view
-        self.move_list_selection()
+        if not self.do_not_refresh_lists:
+            artists = [artist for artist in self.library.keys()]
+            artists.sort()
+            self.ctx.artists_view.setContent(artists)
+            self.ctx.songs_view.unfocus()
+            self.ctx.artists_view.focus()
+            self.focused = self.ctx.artists_view
+            self.unfocused = self.ctx.songs_view
+            self.move_list_selection()
+            self.do_not_refresh_lists = False
         ui = self.ctx.esde_ui
         ui.show()
         
@@ -194,6 +197,7 @@ class EsdeLayer:
             if msg == "source":
                 return self.ctx.source_layer
             elif msg == "change-view":
+                self.do_not_refresh_lists = True
                 return self.ctx.nowplay_layer
             elif msg == ">":
                 self.ctx.artists_view.unfocus()

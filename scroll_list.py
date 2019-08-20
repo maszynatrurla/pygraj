@@ -78,6 +78,8 @@ class ScrollableList(QWidget):
         self.handler.preparePainter(qp)
         
         for idx in xrange(self.scroll_window[0], self.scroll_window[0] + self.scroll_window[1]):
+            if idx >= len(self.content):
+                break
             item = self.content[idx]
             item_preffered_size = self.handler.calculateSize(item)
             
@@ -102,9 +104,10 @@ class ScrollableList(QWidget):
         scroll_start = int(max_scroll_len * (float(self.scroll_window[0]) / len(self.content)))
         if scroll_start + scroll_len > max_scroll_len:
             scroll_start = max_scroll_len - scroll_len
-            
-        ww, wh = self.dims
-        qp.drawLine(ww - 5, 3 + scroll_start, ww - 5, 3 + scroll_start + scroll_len)
+        
+        if scroll_len < max_scroll_len:
+            ww, wh = self.dims
+            qp.drawLine(ww - 5, 3 + scroll_start, ww - 5, 3 + scroll_start + scroll_len)
         
     def setContent(self, content):
         self.selected = []
@@ -164,31 +167,33 @@ class ScrollableList(QWidget):
                 self.selected[-1] = len(self.content) - 1
                 
         if follow:
-            if self.scroll_window[0] > self.selected[-1]:
+            self.scrollToReveal(self.selected[-1])
+                
+        self.update()
+                
+    def scrollToReveal(self, position_idx):
+        if self.content and position_idx >= 0 and position_idx < len(self.content):
+            if self.scroll_window[0] > position_idx:
                 hsum = 0
                 items = 0
-                for idx in xrange(self.selected[-1], len(self.content)):
+                for idx in xrange(position_idx, len(self.content)):
                     hsum += self.handler.calculateSize(self.content[idx])[1]
                     if hsum > self.dims[1]:
                         break
                     items += 1
                 self.scroll_window = (self.selected[-1], items)
                 
-            elif self.selected[-1] >= self.scroll_window[0] + self.scroll_window[1]:
+            elif position_idx >= self.scroll_window[0] + self.scroll_window[1]:
                 hsum = 0
                 items = 0
                 start = 0
-                for idx in xrange(self.selected[-1], -1, -1):
+                for idx in xrange(position_idx, -1, -1):
                     hsum += self.handler.calculateSize(self.content[idx])[1]
                     if hsum > self.dims[1]:
                         break
                     start = idx
                     items += 1
                 self.scroll_window = (start, items)
-                
-        self.update()
-                
-        
         
     def deselect(self, index):
         if index in self.selected:

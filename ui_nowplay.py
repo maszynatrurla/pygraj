@@ -34,9 +34,6 @@ class AlbumArtPanel(QLabel):
         qp.begin(self)
         
         ww, wh = self.dims
-        #qp.fillRect(0, 0, ww, wh, QColor.fromRgb(0, 0, 0))
-        #qp.setPen(QPen(QColor.fromRgb(255, 255, 255), 2, 1, 0, 0x80))
-        #qp.drawRect(1, 1, ww - 2 , wh - 2)
         
         if self.drawArt:
             image = QImage('/var/run/user/1000/pygraj_cover.jpg')
@@ -63,7 +60,6 @@ class PlayStatusView(QWidget):
         ww, wh = self.dims
         qp.fillRect(0, 0, ww, wh, QColor.fromRgb(0, 0, 0))
         qp.setPen(QPen(QColor.fromRgb(255, 255, 255), 2, 1, 0, 0x80))
-        qp.drawRect(1, 1, ww - 2 , wh - 2)
         
         if self.ctx.playlist.position > 0 and self.ctx.playlist.position <= len(self.ctx.playlist.tracks):
             track, title, tlen = self.ctx.playlist.tracks [self.ctx.playlist.position - 1]
