@@ -1,0 +1,63 @@
+
+body {
+    background-color: black;
+    color: white;
+}
+
+button.playcontrol {
+    background-color: #ff752b; 
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow : 2px 2px #555555;
+    display: inline-block;
+    font-size: 16px;
+}
+
+button.srccontrol {
+    background-color: #ff752b; 
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow : 2px 2px #555555;
+    display: inline-block;
+    font-size: 18px;
+    width : 60%;
+}
+
+button.playlist {
+    background-color: #ff752b; 
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    text-shadow : 2px 2px #555555;
+    display: inline-block;
+    font-size : 14px;
+    width : 40px;
+}
+
+.src_area {
+    padding : 1%;
+}
+
+a {
+    color: white;
+}
+
+.listitem {
+    padding : 1%;
+}
+
+.listitem_playing {
+    padding : 1%;
+    font-weight : bold;
+}
+
+.artist_rollup {
+    padding : 1%;
+}

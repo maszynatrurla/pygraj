@@ -1,0 +1,162 @@
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+     <script type="text/javascript">
+        
+        var per_http = new XMLHttpRequest();
+        
+        function grajcmd(cmd) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "acmd?cmd="+cmd, false);
+            xhttp.send();
+        }
+        
+        function nowplay_refresh_sc(data) {
+            if (per_http.readyState == 4) {
+                if (per_http.status == 200) {
+                    obj = JSON.parse(per_http.responseText);
+                    document.getElementById("nowplay_area").innerHTML = obj.current_song;
+                }
+                else {
+                    document.getElementById("nowplay_area").innerHTML = "Coś jest nie tak";
+                }
+                setTimeout(nowplay_refresh, 1000);
+            }
+        }
+        
+        function nowplay_refresh() {
+            per_http.onreadystatechange = nowplay_refresh_sc;
+            per_http.open("GET", "nowplay", true);
+            per_http.send();
+        }
+        
+        function play_artist(idx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "play_artist?queue=0&artist=" + idx, false);
+            xhttp.send();
+        }
+        
+        function queue_artist(idx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "play_artist?queue=1&artist=" + idx, false);
+            xhttp.send();
+        }
+        
+        function play_album(idx, jdx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "play_album?queue=0&artist=" + idx + "&album=" + jdx, false);
+            xhttp.send();
+        }
+        
+        function queue_album(idx, jdx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "play_album?queue=1&artist=" + idx + "&album=" + jdx, false);
+            xhttp.send();
+        }
+        
+        function queue_song(idx, jdx, kdx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "play_song?queue=1&artist=" + idx + "&album=" + jdx + "&song=" + kdx, false);
+            xhttp.send();
+        }
+        
+        function showhide(idx) {
+            block = document.getElementById("art_" + idx)
+            if (block.style.display == "none") {
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("GET", "artist?idx=" + idx, false);
+                xhttp.send();
+                
+                if (per_http.readyState == 4) {
+                    if (per_http.status == 200) {
+                        obj = JSON.parse(xhttp.responseText);
+                        
+                        txt = "<button onclick=\"play_artist(" + idx + ")\">G</button>"
+                        txt += "<button onclick=\"queue_artist(" + idx + ")\">K</button><br/>"
+                        
+                        for (var jdx = 0; jdx < obj.length; ++jdx) {
+                            txt += " <b><button onclick=\"play_album(" + idx + ", " + jdx + ")\">G</button>"
+                            txt += "<button onclick=\"queue_album(" + idx + ", " + jdx + ")\">K</button>"
+                            txt +=  obj[jdx].name + "</b><br/>"
+                            
+                            for (var kdx = 0; kdx < obj[jdx].songs.length; ++kdx) {
+                                txt += "<button onclick=\"queue_song(" + idx + ", " + jdx + ", " + kdx +")\">K</button>"
+                                txt += obj[jdx].songs[kdx].title + "<br/>"
+                            }
+                            
+                            txt += "<br/>"
+                        }
+
+                        block.innerHTML = txt
+                        block.style.display = "block";
+                    }
+                }
+                
+            }
+            else {
+                block.style.display = "none";
+            }
+
+        }
+        
+        function get_page_data() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "artist", false);
+            xhttp.send();
+            
+            if (xhttp.status == 200) {
+                obj = JSON.parse(xhttp.responseText);
+           
+                txt = ""
+
+                for (var idx = 0; idx < obj.length; ++idx) {
+                    txt += "<a href=\"javascript:showhide(" + idx + ")\">" + obj[idx] + "</a><br>"
+                    txt += "<div class=\"artist_rollup\" id=\"art_" + idx + "\" style=\"display:none\"></div>"
+                }
+                
+                document.getElementById("browser_area").innerHTML = txt;
+            }
+            else {
+                document.getElementById("browser_area").innerHTML = "Coś jest nie tak";
+            }
+            
+            nowplay_refresh();
+        }
+        
+        setTimeout(get_page_data, 500)
+     
+   </script>
+   
+     <title>webgraj</title>
+</head>
+<body>
+
+<div class="szystko"> 
+    <div id="nowplay_area">
+        Momencik..
+    </div>
+    <div class="play_controls_area">
+        <button class="playcontrol" onclick="grajcmd('prev')">poprzedni</button>
+        <button class="playcontrol" onclick="grajcmd('playpause')">graj</button>
+        <button class="playcontrol" onclick="grajcmd('stop')">stop</button>
+        <button class="playcontrol" onclick="grajcmd('next')">następny</button>
+    </div>
+    <div>
+        <a href="/">teraz grane</a> <a href="src.html">źródła</a><br/>
+        <a href="javascript:grajcmd('clear')">Wyczyść listę odtwarzania</a>
+    </div>
+        
+    <div id="browser_area">
+        Momencik..
+    </div>
+    
+</div>
+
+</body>
+
+</html>

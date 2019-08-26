@@ -3,6 +3,13 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QColor, QPen
 
 
+class ListItem:
+    
+    def __init__(self, item, index, isSelected):
+        self.data = item
+        self.index = index
+        self.is_selected = isSelected
+
 class ScrollableList(QWidget):
 
     def __init__(self, parent, posx, posy, width, height, contentHandler):
@@ -83,10 +90,8 @@ class ScrollableList(QWidget):
             item = self.content[idx]
             item_preffered_size = self.handler.calculateSize(item)
             
-            if idx in self.selected:
-                self.handler.paint(item, qp, xoff, yoff, xlen, item_preffered_size[1], True)
-            else:
-                self.handler.paint(item, qp, xoff, yoff, xlen, item_preffered_size[1], False)
+            paintItem = ListItem(item, idx, idx in self.selected)
+            self.handler.paint(paintItem, qp, xoff, yoff, xlen, item_preffered_size[1])
                 
             yoff += item_preffered_size[1]
         

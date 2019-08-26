@@ -18,6 +18,9 @@ def playback_stop():
 def playback_playpause():
     os.system("audtool playback-playpause")
     
+def playback_play():
+    os.system("audtool playback-play")
+    
 def playback_playing():
     return 0 == os.system('audtool playback-playing')
     
@@ -26,6 +29,9 @@ def playlist_advance():
     
 def playlist_reverse():
     os.system("audtool playlist-reverse")
+    
+def playlist_jump(pos):
+    os.system("audtool playlist-jump %d" % pos)
 
 def playlist_clear():
     os.system("audtool playlist-clear")

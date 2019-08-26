@@ -39,14 +39,14 @@ class AlbumSongListHandler:
     def unfocus(self):
         self.focused = False
         
-    def paint(self, item, qp, x, y, w, h, is_selected):
-        if is_selected:
+    def paint(self, item, qp, x, y, w, h):
+        if item.is_selected:
             if self.focused:
                 qp.fillRect(1, y, w, h, QColor.fromRgb(201, 148, 22))
             else:
                 qp.fillRect(1, y, w, h, QColor.fromRgb(148, 148, 148))
             
-        tpe, obj = item
+        tpe, obj = item.data
         
         if 0 == tpe:
             qp.drawText(x, y, w, h, 0x81, obj)

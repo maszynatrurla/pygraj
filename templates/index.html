@@ -1,0 +1,91 @@
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+     <script type="text/javascript">
+        
+        var per_http = new XMLHttpRequest();
+        
+        function grajcmd(cmd) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "acmd?cmd="+cmd, false);
+            xhttp.send();
+        }
+        
+        function playlist_setpos(idx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "acmd?cmd=setpos&pos="+idx, false);
+            xhttp.send();
+        }
+        
+        function nowplay_refresh_sc(data) {
+            if (per_http.readyState == 4) {
+                if (per_http.status == 200) {
+                    obj = JSON.parse(per_http.responseText);
+                    document.getElementById("nowplay_area").innerHTML = obj.current_song;
+                    
+                    txt = "";
+                    position = obj.position - 1;
+                    
+                    for (var idx = 0; idx < obj.tracks.length; ++idx) {
+                        entry = obj.tracks[idx];
+                        if (position == idx) {
+                            txt += "<div class=\"listitem_playing\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> " + entry.title + "</div>\n"
+                        }
+                        else {
+                            txt += "<div class=\"listitem\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> " + entry.title + "</div>\n"
+                        }
+                    }
+                    
+                    document.getElementById("nowplay_list_area").innerHTML = txt;
+                }
+                else
+                {
+                    document.getElementById("nowplay_area").innerHTML = "Coś jest nie tak";
+                    document.getElementById("nowplay_list_area").innerHTML = "";
+                }
+
+                setTimeout(nowplay_refresh, 1000);
+            }
+        }
+        
+        function nowplay_refresh() {
+            per_http.onreadystatechange = nowplay_refresh_sc;
+            per_http.open("GET", "nowplay", true);
+            per_http.send();
+        }
+        
+        nowplay_refresh();
+     
+   </script>
+   
+     <title>webgraj</title>
+</head>
+<body>
+
+<div class="szystko"> 
+    <div id="nowplay_area">
+        Momencik..
+    </div>
+    <div class="play_controls_area">
+        <button class="playcontrol" onclick="grajcmd('prev')">poprzedni</button>
+        <button class="playcontrol" onclick="grajcmd('playpause')">graj</button>
+        <button class="playcontrol" onclick="grajcmd('stop')">stop</button>
+        <button class="playcontrol" onclick="grajcmd('next')">następny</button>
+    </div>
+    <div id="nowplay_list_area">
+        Momencik..
+    </div>
+    
+    <div>
+        <a href="esde.html">biblioteka</a> <a href="src.html">źródła</a><br/>
+    </div>
+</div>
+
+</body>
+
+</html>
