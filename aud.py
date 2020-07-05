@@ -1,55 +1,90 @@
 
-import os
-import subprocess
+import dbus
+from threading import Lock
+import urllib
+
+class _Audctl:
+    _lock = Lock()
+    _iface = None
+    
+    @staticmethod
+    def _getIface():
+        if _Audctl._iface is None:
+            with _Audctl._lock:
+                bus = dbus.SessionBus()
+                proxy = bus.get_object("org.atheme.audacious", "/org/atheme/audacious")
+                _Audctl._iface = dbus.Interface(proxy, dbus_interface = "org.atheme.audacious")
+                
+        return _Audctl._iface
+
 
 def current_song():
-    process = subprocess.Popen(['audtool', 'current-song'], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    return out.strip()
+    iface = _Audctl._getIface()
+    return iface.SongTitle(iface.Position())
 
 def current_song_filename():
-    process = subprocess.Popen(['audtool', 'current-song-filename'], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    return out.strip()    
+    iface = _Audctl._getIface()
+    sln = str(iface.SongFilename(iface.Position()))
+    sln = urllib.unquote(sln)
+    if sln.startswith("file:///"):
+        return sln[7:]
+    return sln
 
 def playback_stop():
-    os.system("audtool playback-stop")
+    iface = _Audctl._getIface()
+    iface.Stop()
 
 def playback_playpause():
-    os.system("audtool playback-playpause")
+    iface = _Audctl._getIface()
+    iface.PlayPause()
     
 def playback_play():
-    os.system("audtool playback-play")
+    iface = _Audctl._getIface()
+    iface.Play()
     
 def playback_playing():
-    return 0 == os.system('audtool playback-playing')
+    iface = _Audctl._getIface()
+    return iface.Playing()
     
 def playlist_advance():
-    os.system("audtool playlist-advance")
+    iface = _Audctl._getIface()
+    iface.Advance()
     
 def playlist_reverse():
-    os.system("audtool playlist-reverse")
+    iface = _Audctl._getIface()
+    iface.Reverse()
     
 def playlist_jump(pos):
-    os.system("audtool playlist-jump %d" % pos)
+    iface = _Audctl._getIface()
+    iface.Jump(pos - 1)
 
 def playlist_clear():
-    os.system("audtool playlist-clear")
+    iface = _Audctl._getIface()
+    iface.Clear()
     
 def playlist_addurl(url):
-    os.system("audtool playlist-addurl \"" + url + "\"")
+    if url.startswith("/"):
+        url = "file://" + urllib.pathname2url(url)
+    iface = _Audctl._getIface()
+    iface.AddUrl(url)
     
 def playlist_display():
-    process = subprocess.Popen(['audtool', 'playlist-display'], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    return out
+    iface = _Audctl._getIface()
+    playlist_length = iface.Length()
+    total = 0
+    txt = ["%d track%s" % (playlist_length, "s" if playlist_length > 1 else "")]
+    
+    for entry in range(playlist_length):
+        title = iface.SongTitle(entry)
+        length = int(iface.SongFrames(entry) / 1000)
+        
+        total += length
+        
+        txt.append("%4d | %s | %d:%.2d" % (entry, title, int(length / 60), int(length % 60)))
+    
+    txt.append("Total length: %d:%.2d" % (int(total / 60), int(total % 60)))
+    return "\n".join(txt)
 
 def playlist_position():
-    process = subprocess.Popen(['audtool', 'playlist-position'], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    try:
-        return int(out)
-    except:
-        return -1
-
-        
+    iface = _Audctl._getIface()
+    return iface.Position() + 1
