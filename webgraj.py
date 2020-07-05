@@ -173,7 +173,7 @@ class PlayArtist:
             for song in songs:
                 aud.playlist_addurl(song[0])
                 
-        if int(ipt.queue) != 0:
+        if int(ipt.queue) == 0:
             aud.playback_play()
                 
         return "OK\n"
@@ -202,7 +202,7 @@ class PlayAlbum:
         for song in songs:
             aud.playlist_addurl(song[0])
             
-        if int(ipt.queue) != 0:
+        if int(ipt.queue) == 0:
             aud.playback_play()
                 
         return "OK\n"
@@ -230,7 +230,7 @@ class PlaySong:
         
         aud.playlist_addurl(songs[int(ipt.song)][0])
         
-        if int(ipt.queue) != 0:
+        if int(ipt.queue) == 0:
             aud.playback_play()
                 
         return "OK\n"
