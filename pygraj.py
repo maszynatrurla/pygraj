@@ -2,6 +2,7 @@
 
 import sys
 import logging
+import logging.handlers
 import threading
 import time
 import traceback
@@ -20,10 +21,30 @@ import netradio
 import pod
 import nowplay
 
+PID_FILE="/run/user/1000/pygraj.pid"
+
+LOG_LEVEL="INFO"
+LOG_FILE="/run/user/1000/pygraj.log"
+LOG_MAX_SIZE=2 * 1024 * 1024
+LOG_BACKUPS=2
+
+def create_pid_file():
+    try:
+        with open(PID_FILE, "w") as fp:
+            fp.write(str(os.getpid()))
+    except IOError:
+        print("Unable to create PID file.")
+        sys.exit(-2)
+
 def log_init():
     logging.basicConfig()
-    logging.getLogger().setLevel("INFO")
-    
+    logger = logging.getLogger()
+    formatter = logging.Formatter("%(asctime)s %(message)s")
+    handler = logging.handlers.RotatingFileHandler(LOG_FILE,
+                maxBytes=LOG_MAX_SIZE, backupCount=LOG_BACKUPS)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(LOG_LEVEL)
         
         
 class Context:
@@ -64,6 +85,10 @@ def createLayers(context):
     
 def main():
     ret = -1
+    create_pid_file()
+    log_init()
+    
+    logging.info("Starting application")
     context = Context()
     end_event = threading.Event()
 
@@ -85,8 +110,11 @@ def main():
         context.window = window
         window.show()
         ret = app.exec_()
+    except KeyboardInterrupt:
+        logging.info("Stopping by INT signal")
     except:
-        traceback.print_exc()
+        logging.error("Uncaught exception in main! Traceback follows")
+        logging.error(traceback.format_exc())
     
     end_event.set()
     psc.stop()

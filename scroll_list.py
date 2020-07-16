@@ -186,7 +186,7 @@ class ScrollableList(QWidget):
                     if hsum > self.dims[1]:
                         break
                     items += 1
-                self.scroll_window = (self.selected[-1], items)
+                self.scroll_window = (position_idx, items)
                 
             elif position_idx >= self.scroll_window[0] + self.scroll_window[1]:
                 hsum = 0
