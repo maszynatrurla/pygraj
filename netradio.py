@@ -2,6 +2,8 @@
 import Queue
 import pscan
 import aud
+import json
+import logging
 
 from hardconf import *
 
@@ -30,6 +32,33 @@ class StopHandler(pscan.CzypiskHandler):
     def onClick(self, button):
         aud.playback_stop()
         self.ctx.event_queue.put("playing-changed")
+        
+        
+class NextPrevHandler(pscan.CzypiskHandler):
+    
+    def __init__(self, ctx, parent):
+        self.ctx = ctx
+        self.parent = parent
+    
+    def onClick(self, button):
+        aud.playback_stop()
+        aud.playlist_clear()
+        
+        if button == BUT_NEXT:
+            self.parent.radioIdx += 1
+            if self.parent.radioIdx >= len(self.parent.radios):
+                self.parent.radioIdx = 0
+        else:
+            self.parent.radioIdx -= 1
+            if self.parent.radioIdx < 0:
+                self.parent.radioIdx = len(self.parent.radios) - 1
+        
+        try:
+            aud.playlist_addurl(self.parent.radios[self.parent.radioIdx]["url"])
+            aud.playback_playpause()
+        except Exception as exc:
+            logging.error("Failed to add radio to playlist: %s", exc)
+        
 
 class NetradioLayer:
     
@@ -39,21 +68,29 @@ class NetradioLayer:
         self.srcHandler = SrcHandler(context)
         self.playHandler = PlayPauseHandler(context)
         self.stopHandler = StopHandler(context)
+        self.nextPrevHandler = NextPrevHandler(context, self)
+        self.radioIdx = 0
         
     def open(self):
         if self.isOpen:
             return
-        
+            
+        self.loadRadios()
         self.ctx.buttons.addHandler(self.srcHandler, BUT_SOURCE)
         self.ctx.buttons.addHandler(self.playHandler, BUT_PLAYPAUSE)
         self.ctx.buttons.addHandler(self.stopHandler, BUT_STOP)
+        self.ctx.buttons.addHandler(self.nextPrevHandler, BUT_NEXT)
+        self.ctx.buttons.addHandler(self.nextPrevHandler, BUT_PREVIOUS)
         ui = self.ctx.netradio_ui
         ui.show()
         
         aud.playback_stop()
         aud.playlist_clear()
-        aud.playlist_addurl("https://somafm.com/indiepop.pls")
-        aud.playback_playpause()
+        try:
+            aud.playlist_addurl(self.radios[self.radioIdx]["url"])
+            aud.playback_playpause()
+        except Exception as exc:
+            logging.error("Failed to add radio to playlist: %s", exc)
         
         self.isOpen = True
         
@@ -76,7 +113,17 @@ class NetradioLayer:
         self.ctx.buttons.removeHandler(self.srcHandler, BUT_SOURCE)
         self.ctx.buttons.removeHandler(self.playHandler, BUT_PLAYPAUSE)
         self.ctx.buttons.removeHandler(self.stopHandler, BUT_STOP)
+        self.ctx.buttons.removeHandler(self.nextPrevHandler, BUT_NEXT)
+        self.ctx.buttons.removeHandler(self.nextPrevHandler, BUT_PREVIOUS)
         ui = self.ctx.netradio_ui
         ui.hide()
     
-
+    def loadRadios(self):
+        try:
+            with open("radios.json") as fp:
+                self.radios = json.load(fp)
+        except Exception as exc:
+            self.radios = [{"name":"Indie Pop Rocks!", "url": "https://somafm.com/indiepop.pls"}]
+            logging.error("Failed to read radios list: %s", exc)
+        if self.radioIdx >= len(self.radios):
+            self.radioIdx = 0
