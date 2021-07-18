@@ -22,6 +22,12 @@
             xhttp.send();
         }
         
+        function playlist_delete(idx) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "acmd?cmd=delete&pos="+idx, false);
+            xhttp.send();
+        }
+        
         function nowplay_refresh_sc(data) {
             if (per_http.readyState == 4) {
                 if (per_http.status == 200) {
@@ -34,10 +40,10 @@
                     for (var idx = 0; idx < obj.tracks.length; ++idx) {
                         entry = obj.tracks[idx];
                         if (position == idx) {
-                            txt += "<div class=\"listitem_playing\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> " + entry.title + "</div>\n"
+                            txt += "<div class=\"listitem_playing\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> <button class=\"delete\" onclick=\"playlist_delete(" + idx + ")\">[X]</button>" + entry.title + "</div>\n"
                         }
                         else {
-                            txt += "<div class=\"listitem\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> " + entry.title + "</div>\n"
+                            txt += "<div class=\"listitem\"><button class=\"playlist\" onclick=\"playlist_setpos(" + idx + ")\">" + idx + "</button> <button class=\"delete\" onclick=\"playlist_delete(" + idx + ")\">[X]</button>" + entry.title + "</div>\n"
                         }
                     }
                     

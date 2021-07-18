@@ -92,6 +92,10 @@ class AudCommand:
             aud.playlist_jump(pos + 1)
             aud.playback_play()
             return "OK\n"
+        elif "delete" == cmd:
+            pos = int(ipt.pos)
+            aud.playlist_delete(pos + 1)
+            return "OK\n"
         elif "clear" == cmd:
             aud.playlist_clear()
             return "OK\n"

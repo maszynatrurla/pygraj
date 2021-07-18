@@ -57,6 +57,10 @@ def playlist_reverse():
 def playlist_jump(pos):
     iface = _Audctl._getIface()
     iface.Jump(pos - 1)
+    
+def playlist_delete(pos):
+    iface = _Audctl._getIface()
+    iface.Delete(pos - 1)
 
 def playlist_clear():
     iface = _Audctl._getIface()

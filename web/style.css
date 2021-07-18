@@ -41,6 +41,18 @@ button.playlist {
     width : 40px;
 }
 
+button.delete {
+    background-color: #565b63; 
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    text-shadow : 2px 2px #555555;
+    display: inline-block;
+    font-size : 14px;
+    width : 30px;
+}
+
 .src_area {
     padding : 1%;
 }
