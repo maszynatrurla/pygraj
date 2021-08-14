@@ -4,7 +4,9 @@ import aud
 from hardconf import *
 import ui_source
 import Queue
+import time
 
+IDLE_CYCLES = 60
 
 class UpHandler(pscan.CzypiskHandler):
     
@@ -62,6 +64,7 @@ class SourceLayer:
         self.ctx.buttons.addHandler(self.stopHandler, BUT_STOP)
         self.openDelayed = True
         self.isOpen = True
+        self.idleCounter = 0
         
     def cycle(self):
         ui = self.ctx.source_ui
@@ -93,7 +96,10 @@ class SourceLayer:
                         return self.ctx.pod_layer
                     
         except Queue.Empty:
-            pass
+            self.idleCounter += 1
+            
+        if self.idleCounter > IDLE_CYCLES:
+            return self.ctx.weather_layer
         
     def close(self):
         self.isOpen = False

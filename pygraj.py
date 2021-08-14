@@ -20,6 +20,7 @@ import esde
 import netradio
 import pod
 import nowplay
+import weather
 
 PID_FILE="/run/user/1000/pygraj.pid"
 
@@ -82,6 +83,7 @@ def createLayers(context):
     context.netradio_layer = netradio.NetradioLayer(context)
     context.pod_layer = pod.PodLayer(context)
     context.nowplay_layer = nowplay.NowPlayingLayer(context)
+    context.weather_layer = weather.WeatherLayer(context)
     
 def main():
     ret = -1

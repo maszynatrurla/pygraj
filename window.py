@@ -9,6 +9,7 @@ import ui_esde
 import ui_netradio
 import ui_cede
 import ui_nowplay
+import ui_weather
 
 
 class MyDimensions:
@@ -47,6 +48,8 @@ def createLayers(window, context):
     context.pod_ui.construct(window)
     context.nowplay_ui = ui_nowplay.NowPlayingView(context)
     context.nowplay_ui.construct(window)
+    context.weather_ui = ui_weather.WeatherView(context)
+    context.weather_ui.construct(window)
     
 
 class Gui:
